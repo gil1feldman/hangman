@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>איש תלוי — פיקוד העורף</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1a1a3e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    direction: rtl;
+  }
+
+  .card {
+    background: rgba(15,23,42,0.97);
+    border: 1px solid #1e293b;
+    border-radius: 20px;
+    padding: 30px 24px;
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  }
+  .card.wide { max-width: 480px; padding: 22px 18px; }
+
+  .screen { display: none; width: 100%; flex-direction: column; align-items: center; }
+  .screen.active { display: flex; }
+
+  .badge {
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .badge-blue  { background: #1e3a5f; color: #7dd3fc; }
+  .badge-green { background: #052e16; color: #4ade80; }
+
+  h1 { font-size: 38px; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; letter-spacing: -1px; }
+  h2 { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+
+  .subtitle { color: #475569; font-size: 13px; margin-bottom: 22px; text-align: center; }
+
+  /* Buttons */
+  .btn {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 22px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+    width: 100%;
+    margin-top: 0;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn-ghost {
+    background: #1e293b;
+    color: #64748b;
+    box-shadow: none;
+    margin-top: 8px;
+  }
+  .btn-row { display: flex; gap: 8px; width: 100%; }
+  .btn-row .btn { margin-top: 0; }
+
+  /* Difficulty */
+  .diff-group { display: flex; gap: 8px; margin-bottom: 24px; }
+  .diff-btn {
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 2px solid #334155;
+    background: transparent;
+    color: #64748b;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1;
+  }
+  .diff-btn .sub { font-size: 10px; font-weight: 400; margin-top: 2px; }
+  .diff-btn.active-easy   { border-color: #22c55e; background: rgba(34,197,94,0.1);  color: #22c55e; }
+  .diff-btn.active-medium { border-color: #f59e0b; background: rgba(245,158,11,0.1); color: #f59e0b; }
+  .diff-btn.active-hard   { border-color: #ef4444; background: rgba(239,68,68,0.1);  color: #ef4444; }
+
+  /* Score */
+  .score { color: #475569; font-size: 13px; margin-top: 14px; }
+  .score .win  { color: #22c55e; }
+  .score .loss { color: #ef4444; }
+
+  /* Loading spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { font-size: 44px; animation: spin 1.2s linear infinite; margin-bottom: 12px; }
+  .load-text { color: #94a3b8; font-size: 15px; }
+  .load-sub  { color: #475569; font-size: 12px; margin-top: 6px; }
+
+  /* Error */
+  .error-icon { font-size: 44px; margin-bottom: 12px; }
+  .error-title { color: #ef4444; font-size: 20px; margin-bottom: 8px; }
+  .error-msg { color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 20px; max-width: 260px; line-height: 1.6; }
+
+  /* Playing screen top bar */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; }
+  .back-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 13px; font-family: 'Heebo', sans-serif; }
+  .diff-tag { border-radius: 6px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  .diff-tag-easy   { background: rgba(34,197,94,0.15);  color: #22c55e; }
+  .diff-tag-medium { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .diff-tag-hard   { background: rgba(239,68,68,0.15);  color: #ef4444; }
+
+  /* Attempt dots */
+  .dots { display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap; justify-content: center; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #1e293b; border: 1px solid #334155;
+    transition: background 0.2s;
+  }
+  .dot.wrong { background: #ef4444; border-color: transparent; }
+
+  /* Hangman SVG wrapper */
+  #hangman-svg { margin: 4px 0; }
+
+  /* Word display */
+  #word-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    margin: 14px 0;
+    direction: rtl;
+  }
+  .letter-box {
+    height: 42px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #e2e8f0;
+    transition: color 0.2s;
+  }
+  .letter-box.char  { width: 32px; border-bottom: 2px solid #334155; }
+  .letter-box.space { width: 14px; }
+  .letter-box.blank-sep { width: 28px; border-bottom: 2px solid #334155; }
+  .letter-box.missed { color: #ef4444; }
+
+  /* Keyboard */
+  #keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    max-width: 360px;
+    direction: rtl;
+  }
+  .key {
+    width: 37px; height: 37px; border-radius: 8px; border: none;
+    background: #334155; color: #e2e8f0;
+    font-size: 15px; font-family: 'Heebo', sans-serif; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  .key:hover:not(:disabled) { background: #475569; }
+  .key:disabled { cursor: default; transform: scale(0.88); box-shadow: none; }
+  .key.correct  { background: #14532d; color: #4ade80; }
+  .key.wrong    { background: #1f0808; color: #5c2020; }
+
+  /* Info card */
+  .info-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    width: 100%;
+    text-align: right;
+  }
+  .info-label { color: #475569; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+  .info-row   { color: #e2e8f0; font-size: 13px; margin-bottom: 5px; }
+  .info-row span { color: #64748b; }
+  .info-count-active { color: #f59e0b; }
+
+  /* Result emoji */
+  .result-emoji { font-size: 50px; margin-bottom: 8px; }
+  .result-city  { color: #64748b; font-size: 14px; margin-bottom: 2px; }
+  .result-city strong { color: #e2e8f0; }
+  .result-title-win  { color: #22c55e; }
+  .result-title-lose { color: #ef4444; }
+</style>
+</head>
+<body>
+<div class="card" id="main-card">
+
+  <!-- LOADING -->
+  <div class="screen active" id="screen-loading">
+    <div class="spinner">⏳</div>
+    <p class="load-text">טוען נתוני התראות...</p>
+    <p class="load-sub">GitHub • alarms.csv</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="screen" id="screen-error">
+    <div class="error-icon">⚠️</div>
+    <h2 class="error-title">שגיאה בטעינת הנתונים</h2>
+    <p class="error-msg" id="error-msg">לא ניתן להתחבר לשרת</p>
+    <button class="btn" onclick="fetchData()">🔄 נסה שוב</button>
+  </div>
+
+  <!-- MENU -->
+  <div class="screen" id="screen-menu">
+    <div class="badge badge-green" id="cities-count-badge">✅ 100 יישובים נטענו</div>
+    <h1>איש תלוי</h1>
+    <p class="subtitle">נחש יישובים מ-100 ההתראות האחרונות</p>
+
+    <p style="color:#64748b;font-size:13px;margin-bottom:8px;">דרגת קושי:</p>
+    <div class="diff-group">
+      <button class="diff-btn" id="btn-easy"   onclick="setDiff('easy')">קל<div class="sub">10 ניסיונות</div></button>
+      <button class="diff-btn active-medium" id="btn-medium" onclick="setDiff('medium')">בינוני<div class="sub">7 ניסיונות</div></button>
+      <button class="diff-btn" id="btn-hard"   onclick="setDiff('hard')">קשה<div class="sub">4 ניסיונות</div></button>
+    </div>
+
+    <button class="btn" onclick="startGame()">🎮 התחל משחק</button>
+    <button class="btn btn-ghost" onclick="fetchData()">🔄 רענן נתונים</button>
+
+    <div class="score" id="menu-score" style="display:none">
+      נצחונות: <span class="win" id="score-wins-m">0</span> | הפסדים: <span class="loss" id="score-losses-m">0</span>
+    </div>
+  </div>
+
+  <!-- PLAYING -->
+  <div class="screen" id="screen-playing">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menu')">← תפריט</button>
+      <span class="diff-tag" id="diff-tag">בינוני — 7 נותרו</span>
+    </div>
+
+    <div class="dots" id="attempt-dots"></div>
+
+    <svg id="hangman-svg" width="160" height="180" viewBox="0 0 160 180">
+      <!-- gallows (static) -->
+      <line x1="20" y1="170" x2="140" y2="170" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="170" x2="50"  y2="10"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="10"  x2="100" y2="10"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="10" x2="100" y2="30"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+      <!-- body parts (toggled via JS) -->
+      <circle id="hm-head" cx="100" cy="45" r="15" stroke="#94a3b8" stroke-width="2.5" fill="none" style="display:none"/>
+      <line   id="hm-body" x1="100" y1="60"  x2="100" y2="110" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+      <line   id="hm-larm" x1="100" y1="75"  x2="78"  y2="95"  stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+      <line   id="hm-rarm" x1="100" y1="75"  x2="122" y2="95"  stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+      <line   id="hm-lleg" x1="100" y1="110" x2="78"  y2="140" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+      <line   id="hm-rleg" x1="100" y1="110" x2="122" y2="140" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+      <!-- eyes (dead) -->
+      <g id="hm-eyes" style="display:none">
+        <line x1="94"  y1="40" x2="98"  y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        <line x1="98"  y1="40" x2="94"  y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        <line x1="102" y1="40" x2="106" y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        <line x1="106" y1="40" x2="102" y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- mouth -->
+      <path id="hm-mouth-smile" d="M 94 50 Q 100 55 106 50" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-linecap="round" style="display:none"/>
+      <path id="hm-mouth-frown" d="M 94 52 Q 100 47 106 52" stroke="#ef4444" stroke-width="1.5" fill="none" stroke-linecap="round" style="display:none"/>
+    </svg>
+
+    <div id="word-display"></div>
+    <div id="keyboard"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <h2 id="result-title" class="result-title-win">כל הכבוד!</h2>
+    <p class="result-city" id="result-city">ניחשת נכון: <strong id="result-city-name"></strong></p>
+
+    <div id="result-word-display"></div>
+
+    <div class="info-card">
+      <p class="info-label">📊 נתוני התראות — <span id="info-city-name"></span></p>
+      <p class="info-row"><span>📅 התראה אחרונה: </span><strong id="info-last-alert"></strong></p>
+      <p class="info-row"><span>🔢 התראות מ-28/2/2026: </span><strong id="info-count"></strong></p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="startGame()">🎮 משחק נוסף</button>
+      <button class="btn btn-ghost" style="margin-top:0" onclick="showScreen('menu')">תפריט</button>
+    </div>
+    <div class="score" id="result-score">
+      נצחונות: <span class="win" id="score-wins-r">0</span> | הפסדים: <span class="loss" id="score-losses-r">0</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ───────────────────────────────────────────
+// STATE
+// ───────────────────────────────────────────
+const CSV_URL    = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
+const SINCE_DATE = new Date('2026-02-28T00:00:00');
+const HEB        = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+const DIFF_CFG   = {
+  easy:   { label:'קל',     attempts:10, colorClass:'easy'   },
+  medium: { label:'בינוני', attempts:7,  colorClass:'medium' },
+  hard:   { label:'קשה',    attempts:4,  colorClass:'hard'   },
+};
+
+let cities      = [];   // [{name, lastAlert, count}]
+let currentCity = null;
+let guessed     = [];
+let difficulty  = 'medium';
+let score       = { wins:0, losses:0 };
+
+// ───────────────────────────────────────────
+// SCREEN MANAGEMENT
+// ───────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  // card width
+  document.getElementById('main-card').classList.toggle('wide', name === 'playing');
+}
+
+// ───────────────────────────────────────────
+// FETCH & PARSE
+// ───────────────────────────────────────────
+function fetchData() {
+  showScreen('loading');
+  fetch(CSV_URL)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(text => {
+      const parsed = parseAlarms(text);
+      if (!parsed.length) throw new Error('לא נמצאו נתונים בקובץ');
+      cities = parsed;
+      document.getElementById('cities-count-badge').textContent = '✅ ' + cities.length + ' יישובים נטענו';
+      showScreen('menu');
+    })
+    .catch(err => {
+      document.getElementById('error-msg').textContent = err.message || 'שגיאת רשת';
+      showScreen('error');
+    });
+}
+
+function parseAlarms(csvText) {
+  const result = Papa.parse(csvText, { header:true, skipEmptyLines:true });
+  const cityMap = {};
+  for (const row of result.data) {
+    const city = (row.cities || row.city || '').trim();
+    if (!city) continue;
+    const t = new Date(row.time);
+    if (isNaN(t)) continue;
+    if (!cityMap[city]) cityMap[city] = { lastAlert:t, count:0 };
+    else if (t > cityMap[city].lastAlert) cityMap[city].lastAlert = t;
+    if (t >= SINCE_DATE) cityMap[city].count++;
+  }
+  return Object.entries(cityMap)
+    .sort((a,b) => b[1].lastAlert - a[1].lastAlert)
+    .slice(0, 100)
+    .map(([name, info]) => ({
+      name,
+      lastAlert: info.lastAlert.toLocaleString('he-IL', {
+        timeZone:'Asia/Jerusalem',
+        day:'2-digit', month:'2-digit', year:'numeric',
+        hour:'2-digit', minute:'2-digit'
+      }),
+      count: info.count,
+    }));
+}
+
+// ───────────────────────────────────────────
+// DIFFICULTY
+// ───────────────────────────────────────────
+function setDiff(d) {
+  difficulty = d;
+  ['easy','medium','hard'].forEach(k => {
+    const btn = document.getElementById('btn-' + k);
+    btn.className = 'diff-btn' + (k === d ? ' active-' + k : '');
+  });
+}
+
+// ───────────────────────────────────────────
+// GAME LOGIC
+// ───────────────────────────────────────────
+function startGame() {
+  currentCity = cities[Math.floor(Math.random() * cities.length)];
+  guessed = [];
+  showScreen('playing');
+  renderPlaying();
+}
+
+function renderPlaying() {
+  const cfg      = DIFF_CFG[difficulty];
+  const maxAtt   = cfg.attempts;
+  const wrongArr = guessed.filter(l => !currentCity.name.includes(l));
+  const wrongCnt = wrongArr.length;
+  const left     = maxAtt - wrongCnt;
+
+  // diff tag
+  const tag = document.getElementById('diff-tag');
+  tag.textContent = cfg.label + ' — ' + left + ' נותרו';
+  tag.className = 'diff-tag diff-tag-' + difficulty;
+
+  // dots
+  const dotsEl = document.getElementById('attempt-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < maxAtt; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < wrongCnt ? ' wrong' : '');
+    dotsEl.appendChild(d);
+  }
+
+  // hangman
+  renderHangman(wrongCnt, maxAtt);
+
+  // word
+  renderWord('word-display', currentCity.name, guessed, false);
+
+  // keyboard
+  renderKeyboard();
+}
+
+function renderHangman(wrongCnt, maxAtt) {
+  const parts  = Math.min(8, Math.round((wrongCnt / maxAtt) * 8));
+  const dead   = parts >= 7;
+  const col    = dead ? '#ef4444' : parts >= 4 ? '#f59e0b' : '#94a3b8';
+
+  const ids = ['hm-head','hm-body','hm-larm','hm-rarm','hm-lleg','hm-rleg'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.style.display = parts >= i+1 ? '' : 'none';
+    el.setAttribute('stroke', col);
+  });
+
+  document.getElementById('hm-eyes').style.display = dead ? '' : 'none';
+  document.getElementById('hm-mouth-smile').style.display = (parts >= 1 && !dead) ? '' : 'none';
+  document.getElementById('hm-mouth-smile').setAttribute('stroke', col);
+  document.getElementById('hm-mouth-frown').style.display = dead ? '' : 'none';
+}
+
+function renderWord(containerId, word, guessedArr, revealed) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  for (const ch of word) {
+    const box = document.createElement('div');
+    if (ch === ' ') {
+      box.className = 'letter-box space';
+    } else if (ch === '-' || ch === "'") {
+      box.className = 'letter-box blank-sep';
+      box.textContent = ch;
+    } else {
+      box.className = 'letter-box char';
+      const show = revealed || guessedArr.includes(ch);
+      if (show) {
+        box.textContent = ch;
+        if (revealed && !guessedArr.includes(ch)) box.classList.add('missed');
+      }
+    }
+    container.appendChild(box);
+  }
+}
+
+function renderKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  for (const letter of HEB) {
+    const used    = guessed.includes(letter);
+    const correct = used && currentCity.name.includes(letter);
+    const wrong   = used && !currentCity.name.includes(letter);
+    const btn = document.createElement('button');
+    btn.className = 'key' + (correct ? ' correct' : wrong ? ' wrong' : '');
+    btn.textContent = letter;
+    btn.disabled = used;
+    btn.onclick = () => handleGuess(letter);
+    kb.appendChild(btn);
+  }
+}
+
+function handleGuess(letter) {
+  if (guessed.includes(letter)) return;
+  guessed.push(letter);
+
+  const cfg      = DIFF_CFG[difficulty];
+  const maxAtt   = cfg.attempts;
+  const wrongCnt = guessed.filter(l => !currentCity.name.includes(l)).length;
+  const wordChars = currentCity.name.split('').filter(c => c !== ' ' && c !== '-' && c !== "'");
+  const allRight  = wordChars.every(c => guessed.includes(c));
+
+  if (allRight) {
+    score.wins++;
+    showResult('win');
+  } else if (wrongCnt >= maxAtt) {
+    score.losses++;
+    showResult('lose');
+  } else {
+    renderPlaying();
+  }
+}
+
+function showResult(res) {
+  const won = res === 'win';
+  document.getElementById('result-emoji').textContent     = won ? '🎉' : '💀';
+  document.getElementById('result-title').textContent     = won ? 'כל הכבוד!' : 'אוי לא!';
+  document.getElementById('result-title').className       = 'result-title-' + (won ? 'win' : 'lose');
+  document.getElementById('result-city').firstChild.textContent = (won ? 'ניחשת נכון: ' : 'היישוב היה: ');
+  document.getElementById('result-city-name').textContent = currentCity.name;
+
+  renderWord('result-word-display', currentCity.name, guessed, !won);
+
+  document.getElementById('info-city-name').textContent  = currentCity.name;
+  document.getElementById('info-last-alert').textContent = currentCity.lastAlert;
+  const countEl = document.getElementById('info-count');
+  countEl.textContent = currentCity.count;
+  countEl.className   = currentCity.count > 0 ? 'info-count-active' : '';
+
+  updateScore();
+  showScreen('result');
+}
+
+function updateScore() {
+  ['m','r'].forEach(sfx => {
+    document.getElementById('score-wins-'   + sfx).textContent = score.wins;
+    document.getElementById('score-losses-' + sfx).textContent = score.losses;
+  });
+  const total = score.wins + score.losses;
+  document.getElementById('menu-score').style.display   = total > 0 ? '' : 'none';
+  document.getElementById('result-score').style.display = total > 0 ? '' : 'none';
+}
+
+// ───────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────
+fetchData();
+</script>
+</body>
+</html>
