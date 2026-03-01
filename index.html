@@ -478,23 +478,38 @@ function renderHangman(wrongCnt, maxAtt) {
 function renderWord(containerId, word, guessedArr, revealed) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
-  for (const ch of word) {
-    const box = document.createElement('div');
-    if (ch === ' ') {
-      box.className = 'letter-box space';
-    } else if (ch === '-' || ch === "'") {
-      box.className = 'letter-box blank-sep';
-      box.textContent = ch;
-    } else {
-      box.className = 'letter-box char';
-      const show = revealed || guessedArr.includes(ch);
-      if (show) {
+
+  // Split by spaces so each word-segment stays on its own line
+  const segments = word.split(' ');
+  segments.forEach((segment, si) => {
+    // Wrap each segment in a no-break container
+    const segEl = document.createElement('div');
+    segEl.style.cssText = 'display:inline-flex;flex-wrap:nowrap;gap:5px;';
+
+    for (const ch of segment) {
+      const box = document.createElement('div');
+      if (ch === '-' || ch === "'") {
+        box.className = 'letter-box blank-sep';
         box.textContent = ch;
-        if (revealed && !guessedArr.includes(ch)) box.classList.add('missed');
+      } else {
+        box.className = 'letter-box char';
+        const show = revealed || guessedArr.includes(ch);
+        if (show) {
+          box.textContent = ch;
+          if (revealed && !guessedArr.includes(ch)) box.classList.add('missed');
+        }
       }
+      segEl.appendChild(box);
     }
-    container.appendChild(box);
-  }
+    container.appendChild(segEl);
+
+    // Add space gap between segments (except after last)
+    if (si < segments.length - 1) {
+      const sp = document.createElement('div');
+      sp.className = 'letter-box space';
+      container.appendChild(sp);
+    }
+  });
 }
 
 function renderKeyboard() {
