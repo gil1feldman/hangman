@@ -333,6 +333,19 @@ const CSV_URL        = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/re
 const CSV_URL_PROXY  = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
 const SINCE_DATE = new Date('2026-02-28T00:00:00');
 const HEB        = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+// Map regular letter → final form (and back)
+const FINALS = { 'כ':'ך', 'מ':'ם', 'נ':'ן', 'פ':'ף', 'צ':'ץ' };
+const FINALS_REV = Object.fromEntries(Object.entries(FINALS).map(([k,v]) => [v,k]));
+// Returns true if guessed letter matches the character (accounting for finals)
+function letterMatches(guessed, ch) {
+  return guessed === ch
+    || (FINALS[guessed] && FINALS[guessed] === ch)
+    || (FINALS_REV[guessed] && FINALS_REV[guessed] === ch);
+}
+// Returns true if the word contains a match for the guessed letter
+function wordContains(word, letter) {
+  return word.split('').some(ch => letterMatches(letter, ch));
+}
 const DIFF_CFG   = {
   easy:   { label:'קל',     attempts:10, colorClass:'easy'   },
   medium: { label:'בינוני', attempts:7,  colorClass:'medium' },
@@ -429,7 +442,7 @@ function startGame() {
 function renderPlaying() {
   const cfg      = DIFF_CFG[difficulty];
   const maxAtt   = cfg.attempts;
-  const wrongArr = guessed.filter(l => !currentCity.name.includes(l));
+  const wrongArr = guessed.filter(l => !wordContains(currentCity.name, l));
   const wrongCnt = wrongArr.length;
   const left     = maxAtt - wrongCnt;
 
@@ -493,10 +506,10 @@ function renderWord(containerId, word, guessedArr, revealed) {
         box.textContent = ch;
       } else {
         box.className = 'letter-box char';
-        const show = revealed || guessedArr.includes(ch);
+        const show = revealed || guessedArr.some(g => letterMatches(g, ch));
         if (show) {
           box.textContent = ch;
-          if (revealed && !guessedArr.includes(ch)) box.classList.add('missed');
+          if (revealed && !guessedArr.some(g => letterMatches(g, ch))) box.classList.add('missed');
         }
       }
       segEl.appendChild(box);
@@ -517,8 +530,8 @@ function renderKeyboard() {
   kb.innerHTML = '';
   for (const letter of HEB) {
     const used    = guessed.includes(letter);
-    const correct = used && currentCity.name.includes(letter);
-    const wrong   = used && !currentCity.name.includes(letter);
+    const correct = used && wordContains(currentCity.name, letter);
+    const wrong   = used && !wordContains(currentCity.name, letter);
     const btn = document.createElement('button');
     btn.className = 'key' + (correct ? ' correct' : wrong ? ' wrong' : '');
     btn.textContent = letter;
@@ -534,9 +547,9 @@ function handleGuess(letter) {
 
   const cfg      = DIFF_CFG[difficulty];
   const maxAtt   = cfg.attempts;
-  const wrongCnt = guessed.filter(l => !currentCity.name.includes(l)).length;
+  const wrongCnt = guessed.filter(l => !wordContains(currentCity.name, l)).length;
   const wordChars = currentCity.name.split('').filter(c => c !== ' ' && c !== '-' && c !== "'");
-  const allRight  = wordChars.every(c => guessed.includes(c));
+  const allRight  = wordChars.every(c => guessed.some(g => letterMatches(g, c)));
 
   if (allRight) {
     score.wins++;
