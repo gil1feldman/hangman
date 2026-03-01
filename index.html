@@ -135,12 +135,15 @@
   #hangman-svg { margin: 4px 0; }
 
   /* Word display */
-  #word-display {
+  #word-display, #result-word-display {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 5px;
     justify-content: center;
+    align-items: flex-end;
     margin: 14px 0;
+    width: 100%;
     direction: rtl;
   }
   .letter-box {
@@ -224,23 +227,39 @@
 
   <!-- MENU -->
   <div class="screen" id="screen-menu">
-    <div class="badge badge-green" id="cities-count-badge">✅ 100 יישובים נטענו</div>
-    <h1>איש תלוי</h1>
-    <p class="subtitle">נחש יישובים מ-100 ההתראות האחרונות</p>
 
-    <p style="color:#64748b;font-size:13px;margin-bottom:8px;">דרגת קושי:</p>
+    <svg width="110" height="130" viewBox="0 0 160 180" style="margin-bottom:8px;opacity:0.5;">
+      <line x1="20" y1="170" x2="140" y2="170" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="170" x2="50"  y2="10"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="10"  x2="100" y2="10"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="10" x2="100" y2="30"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="100" cy="45" r="15" stroke="#7dd3fc" stroke-width="2.5" fill="none"/>
+      <line x1="100" y1="60"  x2="100" y2="110" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="100" y1="75"  x2="78"  y2="95"  stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="100" y1="75"  x2="122" y2="95"  stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="100" y1="110" x2="78"  y2="140" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="100" y1="110" x2="122" y2="140" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 94 50 Q 100 55 106 50" stroke="#7dd3fc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <h1 style="font-size:48px;margin-bottom:10px;">איש תלוי</h1>
+    <p style="color:#94a3b8;font-size:14px;font-weight:400;line-height:1.6;text-align:center;margin-bottom:30px;max-width:280px;">בואו לנחש שמות של יישובים בהם היו לאחרונה התראות של פיקוד העורף</p>
+
+    <p style="color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;font-weight:600;">רמת קושי</p>
     <div class="diff-group">
       <button class="diff-btn" id="btn-easy"   onclick="setDiff('easy')">קל<div class="sub">10 ניסיונות</div></button>
       <button class="diff-btn active-medium" id="btn-medium" onclick="setDiff('medium')">בינוני<div class="sub">7 ניסיונות</div></button>
       <button class="diff-btn" id="btn-hard"   onclick="setDiff('hard')">קשה<div class="sub">4 ניסיונות</div></button>
     </div>
 
-    <button class="btn" onclick="startGame()">🎮 התחל משחק</button>
-    <button class="btn btn-ghost" onclick="fetchData()">🔄 רענן נתונים</button>
+    <button class="btn" style="font-size:16px;padding:14px 22px;" onclick="startGame()">התחל משחק</button>
 
-    <div class="score" id="menu-score" style="display:none">
-      נצחונות: <span class="win" id="score-wins-m">0</span> | הפסדים: <span class="loss" id="score-losses-m">0</span>
+    <div class="score" id="menu-score" style="display:none;margin-top:18px;">
+      נצחונות: <span class="win" id="score-wins-m">0</span> &nbsp;|&nbsp; הפסדים: <span class="loss" id="score-losses-m">0</span>
     </div>
+
+    <span style="color:#1e3a5f;font-size:11px;cursor:pointer;margin-top:18px;" onclick="fetchData()">↺ רענן נתונים</span>
+
   </div>
 
   <!-- PLAYING -->
@@ -310,7 +329,8 @@
 // ───────────────────────────────────────────
 // STATE
 // ───────────────────────────────────────────
-const CSV_URL    = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
+const CSV_URL        = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
+const CSV_URL_PROXY  = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
 const SINCE_DATE = new Date('2026-02-28T00:00:00');
 const HEB        = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
 const DIFF_CFG   = {
@@ -340,13 +360,17 @@ function showScreen(name) {
 // ───────────────────────────────────────────
 function fetchData() {
   showScreen('loading');
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
+
+  // Try direct first; on CORS/network failure fall back to proxy
   fetch(CSV_URL)
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .catch(() => fetch(proxy).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }))
     .then(text => {
       const parsed = parseAlarms(text);
       if (!parsed.length) throw new Error('לא נמצאו נתונים בקובץ');
       cities = parsed;
-      document.getElementById('cities-count-badge').textContent = '✅ ' + cities.length + ' יישובים נטענו';
+
       showScreen('menu');
     })
     .catch(err => {
@@ -545,5 +569,8 @@ function updateScore() {
 // ───────────────────────────────────────────
 fetchData();
 </script>
+<div style="position:fixed;bottom:10px;width:100%;text-align:center;color:#334155;font-size:11px;font-family:'Heebo',sans-serif;pointer-events:none;">
+  נתונים: פיקוד העורף, בסיוע יובל הרפז
+</div>
 </body>
 </html>
