@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>איש תלוי — פיקוד העורף</title>
+<title>בריחה מהפצצה — פיקוד העורף</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
@@ -11,7 +11,7 @@
 
   body {
     font-family: 'Heebo', sans-serif;
-    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1a1a3e 100%);
+    background: linear-gradient(160deg, #060b18 0%, #0d1a2e 50%, #0a1520 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -21,8 +21,8 @@
   }
 
   .card {
-    background: rgba(15,23,42,0.97);
-    border: 1px solid #1e293b;
+    background: rgba(10,18,32,0.97);
+    border: 1px solid #1a2a40;
     border-radius: 20px;
     padding: 30px 24px;
     max-width: 420px;
@@ -30,31 +30,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
   }
   .card.wide { max-width: 480px; padding: 22px 18px; }
 
   .screen { display: none; width: 100%; flex-direction: column; align-items: center; }
   .screen.active { display: flex; }
 
-  .badge {
-    border-radius: 20px;
-    padding: 4px 14px;
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-  .badge-blue  { background: #1e3a5f; color: #7dd3fc; }
-  .badge-green { background: #052e16; color: #4ade80; }
-
   h1 { font-size: 38px; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; letter-spacing: -1px; }
   h2 { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
 
   .subtitle { color: #475569; font-size: 13px; margin-bottom: 22px; text-align: center; }
 
-  /* Buttons */
   .btn {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    background: linear-gradient(135deg, #1d6fa4, #1a4fa8);
     color: white;
     border: none;
     border-radius: 12px;
@@ -63,7 +52,7 @@
     font-weight: 700;
     font-family: 'Heebo', sans-serif;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+    box-shadow: 0 4px 14px rgba(29,111,164,0.4);
     width: 100%;
     margin-top: 0;
     transition: opacity 0.15s;
@@ -78,7 +67,6 @@
   .btn-row { display: flex; gap: 8px; width: 100%; }
   .btn-row .btn { margin-top: 0; }
 
-  /* Difficulty */
   .diff-group { display: flex; gap: 8px; margin-bottom: 24px; }
   .diff-btn {
     padding: 9px 16px;
@@ -98,23 +86,19 @@
   .diff-btn.active-medium { border-color: #f59e0b; background: rgba(245,158,11,0.1); color: #f59e0b; }
   .diff-btn.active-hard   { border-color: #ef4444; background: rgba(239,68,68,0.1);  color: #ef4444; }
 
-  /* Score */
   .score { color: #475569; font-size: 13px; margin-top: 14px; }
   .score .win  { color: #22c55e; }
   .score .loss { color: #ef4444; }
 
-  /* Loading spinner */
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner { font-size: 44px; animation: spin 1.2s linear infinite; margin-bottom: 12px; }
   .load-text { color: #94a3b8; font-size: 15px; }
   .load-sub  { color: #475569; font-size: 12px; margin-top: 6px; }
 
-  /* Error */
-  .error-icon { font-size: 44px; margin-bottom: 12px; }
+  .error-icon  { font-size: 44px; margin-bottom: 12px; }
   .error-title { color: #ef4444; font-size: 20px; margin-bottom: 8px; }
-  .error-msg { color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 20px; max-width: 260px; line-height: 1.6; }
+  .error-msg   { color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 20px; max-width: 260px; line-height: 1.6; }
 
-  /* Playing screen top bar */
   .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; }
   .back-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 13px; font-family: 'Heebo', sans-serif; }
   .diff-tag { border-radius: 6px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
@@ -122,7 +106,6 @@
   .diff-tag-medium { background: rgba(245,158,11,0.15); color: #f59e0b; }
   .diff-tag-hard   { background: rgba(239,68,68,0.15);  color: #ef4444; }
 
-  /* Attempt dots */
   .dots { display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap; justify-content: center; }
   .dot {
     width: 10px; height: 10px; border-radius: 50%;
@@ -131,10 +114,8 @@
   }
   .dot.wrong { background: #ef4444; border-color: transparent; }
 
-  /* Hangman SVG wrapper */
-  #hangman-svg { margin: 4px 0; }
+  #scene-svg { margin: 4px 0; }
 
-  /* Word display */
   #word-display, #result-word-display {
     display: flex;
     flex-direction: row;
@@ -162,7 +143,6 @@
   .letter-box.blank-sep { width: 28px; border-bottom: 2px solid #334155; }
   .letter-box.missed { color: #ef4444; }
 
-  /* Keyboard */
   #keyboard {
     display: flex;
     flex-wrap: wrap;
@@ -184,7 +164,6 @@
   .key.correct  { background: #14532d; color: #4ade80; }
   .key.wrong    { background: #1f0808; color: #5c2020; }
 
-  /* Info card */
   .info-card {
     background: #0f172a;
     border: 1px solid #1e293b;
@@ -199,12 +178,34 @@
   .info-row span { color: #64748b; }
   .info-count-active { color: #f59e0b; }
 
-  /* Result emoji */
   .result-emoji { font-size: 50px; margin-bottom: 8px; }
   .result-city  { color: #64748b; font-size: 14px; margin-bottom: 2px; }
   .result-city strong { color: #e2e8f0; }
   .result-title-win  { color: #22c55e; }
   .result-title-lose { color: #ef4444; }
+
+  /* Explosion animation */
+  @keyframes explode {
+    0%   { opacity:0; transform: scale(0.2); }
+    30%  { opacity:1; transform: scale(1.4); }
+    60%  { opacity:1; transform: scale(1.1); }
+    100% { opacity:0.7; transform: scale(1); }
+  }
+  .explosion-anim { animation: explode 0.6s ease-out forwards; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-5px); }
+    80%      { transform: translateX(5px); }
+  }
+  .shake { animation: shake 0.5s ease; }
+
+  @keyframes bomb-fall {
+    from { transform: translate(0,0) rotate(0deg); }
+    to   { transform: translate(var(--bx), var(--by)) rotate(var(--br)); }
+  }
 </style>
 </head>
 <body>
@@ -228,22 +229,79 @@
   <!-- MENU -->
   <div class="screen" id="screen-menu">
 
-    <svg width="110" height="130" viewBox="0 0 160 180" style="margin-bottom:8px;opacity:0.5;">
-      <line x1="20" y1="170" x2="140" y2="170" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-      <line x1="50" y1="170" x2="50"  y2="10"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-      <line x1="50" y1="10"  x2="100" y2="10"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-      <line x1="100" y1="10" x2="100" y2="30"  stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="100" cy="45" r="15" stroke="#7dd3fc" stroke-width="2.5" fill="none"/>
-      <line x1="100" y1="60"  x2="100" y2="110" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="100" y1="75"  x2="78"  y2="95"  stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="100" y1="75"  x2="122" y2="95"  stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="100" y1="110" x2="78"  y2="140" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="100" y1="110" x2="122" y2="140" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M 94 50 Q 100 55 106 50" stroke="#7dd3fc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- Preview scene -->
+    <svg width="200" height="130" viewBox="0 0 200 130" style="margin-bottom:8px;opacity:0.7;">
+      <!-- sky gradient -->
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0a1a3a"/>
+          <stop offset="100%" stop-color="#1a3a5a"/>
+        </linearGradient>
+        <linearGradient id="groundG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2d4a1e"/>
+          <stop offset="100%" stop-color="#1a2e10"/>
+        </linearGradient>
+      </defs>
+      <rect width="200" height="100" fill="url(#sky)" rx="8"/>
+      <rect y="100" width="200" height="30" fill="url(#groundG)" rx="4"/>
+      <!-- Stars -->
+      <circle cx="20"  cy="15" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50"  cy="8"  r="1" fill="white" opacity="0.5"/>
+      <circle cx="80"  cy="20" r="1" fill="white" opacity="0.7"/>
+      <circle cx="130" cy="10" r="1" fill="white" opacity="0.5"/>
+      <circle cx="170" cy="18" r="1" fill="white" opacity="0.6"/>
+      <!-- F-35 jet (facing left, flying right to left) -->
+      <g transform="translate(140,25) scale(0.8)">
+        <!-- fuselage -->
+        <ellipse cx="0" cy="0" rx="28" ry="5" fill="#c0c8d0"/>
+        <!-- nose -->
+        <polygon points="28,-4 28,4 50,0" fill="#a0a8b0"/>
+        <!-- cockpit -->
+        <ellipse cx="20" cy="-2" rx="8" ry="4" fill="#4a8fc0" opacity="0.9"/>
+        <!-- main wing left -->
+        <polygon points="-5,-5 15,-5 5,-22 -15,-20" fill="#b0b8c0"/>
+        <!-- main wing right -->
+        <polygon points="-5,5 15,5 5,22 -15,20" fill="#b0b8c0"/>
+        <!-- tail fin up -->
+        <polygon points="-22,-5 -10,-5 -18,-18" fill="#9098a0"/>
+        <!-- Israeli star of David simple -->
+        <text x="0" y="3" font-size="8" text-anchor="middle" fill="#1a5fa8" font-weight="bold">✡</text>
+        <!-- engine glow -->
+        <ellipse cx="-28" cy="0" rx="4" ry="3" fill="#ff8c00" opacity="0.8"/>
+        <ellipse cx="-32" cy="0" rx="6" ry="2" fill="#ff4400" opacity="0.5"/>
+      </g>
+      <!-- Bomb falling from jet -->
+      <g transform="translate(148,38)">
+        <ellipse cx="0" cy="0" rx="4" ry="7" fill="#6b7280" transform="rotate(20)"/>
+        <polygon points="-3,-7 3,-7 0,-13" fill="#9ca3af" transform="rotate(20)"/>
+        <polygon points="-5,5 5,5 0,9" fill="#6b7280" transform="rotate(20)"/>
+      </g>
+      <!-- Running figure -->
+      <g transform="translate(60,90)">
+        <!-- body -->
+        <circle cx="0" cy="-26" r="6" fill="#c8a882"/>
+        <!-- torso -->
+        <line x1="0" y1="-20" x2="0" y2="-6" stroke="#8b5e3c" stroke-width="4" stroke-linecap="round"/>
+        <!-- left arm back -->
+        <line x1="0" y1="-16" x2="-10" y2="-6" stroke="#8b5e3c" stroke-width="3" stroke-linecap="round"/>
+        <!-- right arm forward -->
+        <line x1="0" y1="-16" x2="10" y2="-8" stroke="#8b5e3c" stroke-width="3" stroke-linecap="round"/>
+        <!-- running legs -->
+        <line x1="0" y1="-6" x2="-8" y2="6" stroke="#5c4033" stroke-width="3" stroke-linecap="round"/>
+        <line x1="0" y1="-6" x2="8" y2="2" stroke="#5c4033" stroke-width="3" stroke-linecap="round"/>
+        <!-- feet -->
+        <line x1="-8" y1="6" x2="-13" y2="3" stroke="#5c4033" stroke-width="2" stroke-linecap="round"/>
+        <line x1="8" y1="2"  x2="14" y2="5" stroke="#5c4033" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- Danger arrow -->
+      <text x="110" y="75" font-size="18" fill="#ef4444" opacity="0.8">⚡</text>
     </svg>
 
-    <h1 style="font-size:48px;margin-bottom:10px;">איש תלוי</h1>
-    <p style="color:#94a3b8;font-size:14px;font-weight:400;line-height:1.6;text-align:center;margin-bottom:30px;max-width:280px;">בואו לנחש שמות של יישובים בהם היו לאחרונה התראות של פיקוד העורף</p>
+    <h1 style="font-size:42px;margin-bottom:6px;">בריחה מהפצצה</h1>
+    <p style="color:#94a3b8;font-size:13px;font-weight:400;line-height:1.6;text-align:center;margin-bottom:26px;max-width:280px;">
+      נחשו את שם היישוב לפני שהפצצה פוגעת!<br>
+      <span style="color:#475569;font-size:12px;">נתוני התראות אמיתיים — פיקוד העורף</span>
+    </p>
 
     <p style="color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;font-weight:600;">רמת קושי</p>
     <div class="diff-group">
@@ -252,14 +310,12 @@
       <button class="diff-btn" id="btn-hard"   onclick="setDiff('hard')">קשה<div class="sub">4 ניסיונות</div></button>
     </div>
 
-    <button class="btn" style="font-size:16px;padding:14px 22px;" onclick="startGame()">התחל משחק</button>
+    <button class="btn" style="font-size:16px;padding:14px 22px;" onclick="startGame()">🚀 התחל משחק</button>
 
     <div class="score" id="menu-score" style="display:none;margin-top:18px;">
-      נצחונות: <span class="win" id="score-wins-m">0</span> &nbsp;|&nbsp; הפסדים: <span class="loss" id="score-losses-m">0</span>
+      הצלחות: <span class="win" id="score-wins-m">0</span> &nbsp;|&nbsp; פגיעות: <span class="loss" id="score-losses-m">0</span>
     </div>
-
     <span style="color:#1e3a5f;font-size:11px;cursor:pointer;margin-top:18px;" onclick="fetchData()">↺ רענן נתונים</span>
-
   </div>
 
   <!-- PLAYING -->
@@ -271,29 +327,136 @@
 
     <div class="dots" id="attempt-dots"></div>
 
-    <svg id="hangman-svg" width="160" height="180" viewBox="0 0 160 180">
-      <!-- gallows (static) -->
-      <line x1="20" y1="170" x2="140" y2="170" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
-      <line x1="50" y1="170" x2="50"  y2="10"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
-      <line x1="50" y1="10"  x2="100" y2="10"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
-      <line x1="100" y1="10" x2="100" y2="30"  stroke="#334155" stroke-width="3" stroke-linecap="round"/>
-      <!-- body parts (toggled via JS) -->
-      <circle id="hm-head" cx="100" cy="45" r="15" stroke="#94a3b8" stroke-width="2.5" fill="none" style="display:none"/>
-      <line   id="hm-body" x1="100" y1="60"  x2="100" y2="110" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
-      <line   id="hm-larm" x1="100" y1="75"  x2="78"  y2="95"  stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
-      <line   id="hm-rarm" x1="100" y1="75"  x2="122" y2="95"  stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
-      <line   id="hm-lleg" x1="100" y1="110" x2="78"  y2="140" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
-      <line   id="hm-rleg" x1="100" y1="110" x2="122" y2="140" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
-      <!-- eyes (dead) -->
-      <g id="hm-eyes" style="display:none">
-        <line x1="94"  y1="40" x2="98"  y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
-        <line x1="98"  y1="40" x2="94"  y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
-        <line x1="102" y1="40" x2="106" y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
-        <line x1="106" y1="40" x2="102" y2="44" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+    <!-- THE SCENE SVG -->
+    <svg id="scene-svg" width="300" height="190" viewBox="0 0 300 190">
+      <defs>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#060d1f"/>
+          <stop offset="100%" stop-color="#0d2240"/>
+        </linearGradient>
+        <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2d4a1e"/>
+          <stop offset="100%" stop-color="#182910"/>
+        </linearGradient>
+        <radialGradient id="explGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#ffffff"/>
+          <stop offset="20%"  stop-color="#ffff00"/>
+          <stop offset="50%"  stop-color="#ff6600"/>
+          <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Sky -->
+      <rect width="300" height="155" fill="url(#skyG)"/>
+      <!-- Ground -->
+      <rect y="155" width="300" height="35" fill="url(#groundGrad)"/>
+      <!-- Ground line -->
+      <line x1="0" y1="155" x2="300" y2="155" stroke="#3d6b28" stroke-width="1.5"/>
+
+      <!-- Stars (static) -->
+      <circle cx="15"  cy="12" r="0.8" fill="white" opacity="0.6"/>
+      <circle cx="40"  cy="6"  r="0.8" fill="white" opacity="0.5"/>
+      <circle cx="80"  cy="18" r="0.8" fill="white" opacity="0.7"/>
+      <circle cx="200" cy="10" r="0.8" fill="white" opacity="0.5"/>
+      <circle cx="250" cy="20" r="0.8" fill="white" opacity="0.6"/>
+      <circle cx="130" cy="5"  r="0.8" fill="white" opacity="0.4"/>
+      <circle cx="270" cy="8"  r="0.8" fill="white" opacity="0.7"/>
+
+      <!-- JET (static in top-right) -->
+      <g id="jet-group" transform="translate(230, 30) scale(0.9)">
+        <!-- engine glow trail -->
+        <ellipse cx="-38" cy="0" rx="12" ry="3" fill="#ff6600" opacity="0.4"/>
+        <ellipse cx="-32" cy="0" rx="6"  ry="2" fill="#ff8c00" opacity="0.6"/>
+        <!-- fuselage -->
+        <ellipse cx="0" cy="0" rx="32" ry="6" fill="#c0c8d0"/>
+        <!-- nose -->
+        <polygon points="32,-5 32,5 58,0" fill="#a8b0b8"/>
+        <!-- cockpit -->
+        <ellipse cx="22" cy="-2" rx="10" ry="5" fill="#3a7aaa" opacity="0.95"/>
+        <ellipse cx="24" cy="-3" rx="6"  ry="3" fill="#5aaae0" opacity="0.5"/>
+        <!-- main wings -->
+        <polygon points="-4,-6 18,-6 8,-26 -18,-24" fill="#b0b8c0"/>
+        <polygon points="-4,6  18,6  8,26  -18,24"  fill="#b0b8c0"/>
+        <!-- tail fin -->
+        <polygon points="-25,-6 -12,-6 -20,-20" fill="#9098a0"/>
+        <polygon points="-25,6  -12,6  -20,20"  fill="#9098a0"/>
+        <!-- Israeli star -->
+        <text x="2" y="4" font-size="10" text-anchor="middle" fill="#1a5fa8" font-weight="bold" opacity="0.9">✡</text>
       </g>
-      <!-- mouth -->
-      <path id="hm-mouth-smile" d="M 94 50 Q 100 55 106 50" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-linecap="round" style="display:none"/>
-      <path id="hm-mouth-frown" d="M 94 52 Q 100 47 106 52" stroke="#ef4444" stroke-width="1.5" fill="none" stroke-linecap="round" style="display:none"/>
+
+      <!-- BOMB group - position updated by JS -->
+      <g id="bomb-group" style="display:none">
+        <!-- bomb body -->
+        <ellipse id="bomb-body" cx="0" cy="0" rx="5" ry="9" fill="#4a5568"/>
+        <!-- bomb nose -->
+        <polygon id="bomb-nose" points="-4,-9 4,-9 0,-18" fill="#718096"/>
+        <!-- bomb fins -->
+        <polygon id="bomb-fin1" points="-6,7 6,7 3,14 -3,14" fill="#4a5568"/>
+        <polygon id="bomb-fin2" points="-7,5 -5,5 -5,13 -9,13" fill="#5a6678"/>
+        <polygon id="bomb-fin3" points="7,5  5,5  5,13  9,13"  fill="#5a6678"/>
+        <!-- danger glow -->
+        <circle cx="0" cy="0" r="12" fill="#ef4444" opacity="0.08"/>
+      </g>
+
+      <!-- RUNNING FIGURE group - x position updated by JS -->
+      <g id="figure-group" transform="translate(80, 155)">
+        <!-- shadow -->
+        <ellipse id="fig-shadow" cx="0" cy="2" rx="14" ry="4" fill="black" opacity="0.3"/>
+        <!-- body: head -->
+        <circle id="fig-head" cx="0" cy="-38" r="8" fill="#c8a882"/>
+        <!-- beard -->
+        <ellipse id="fig-beard" cx="0" cy="-32" rx="5" ry="3" fill="#6b4c2a" opacity="0.7"/>
+        <!-- torso -->
+        <rect id="fig-torso" x="-7" y="-30" width="14" height="16" rx="3" fill="#2d5a27"/>
+        <!-- left arm (swings back) -->
+        <line id="fig-larm" x1="-7" y1="-26" x2="-16" y2="-14" stroke="#8b5e3c" stroke-width="4" stroke-linecap="round"/>
+        <!-- right arm (swings fwd) -->
+        <line id="fig-rarm" x1="7"  y1="-26" x2="16"  y2="-16" stroke="#8b5e3c" stroke-width="4" stroke-linecap="round"/>
+        <!-- left leg -->
+        <line id="fig-lleg" x1="-3" y1="-14" x2="-10" y2="0" stroke="#1a3a10" stroke-width="5" stroke-linecap="round"/>
+        <!-- right leg -->
+        <line id="fig-rleg" x1="3"  y1="-14" x2="10"  y2="-4" stroke="#1a3a10" stroke-width="5" stroke-linecap="round"/>
+        <!-- shoes -->
+        <ellipse id="fig-lshoe" cx="-11" cy="2"  rx="6" ry="3" fill="#2c1a0e"/>
+        <ellipse id="fig-rshoe" cx="11"  cy="-2" rx="6" ry="3" fill="#2c1a0e"/>
+        <!-- sweat drop -->
+        <ellipse id="fig-sweat" cx="12" cy="-42" rx="3" ry="4" fill="#7dd3fc" opacity="0.7"/>
+        <polygon id="fig-sweat2" points="9,-42 15,-42 12,-48" fill="#7dd3fc" opacity="0.7"/>
+      </g>
+
+      <!-- EXPLOSION (hidden by default) -->
+      <g id="explosion-group" style="display:none" transform="translate(80,145)">
+        <circle id="expl-main"   cx="0" cy="0" r="35" fill="url(#explGrad)" opacity="0"/>
+        <!-- blast rays -->
+        <g id="expl-rays" opacity="0">
+          <line x1="0" y1="0" x2="0"   y2="-55" stroke="#ffcc00" stroke-width="4" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="45"  y2="-35" stroke="#ff8800" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="55"  y2="0"   stroke="#ff6600" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="40"  y2="30"  stroke="#ff4400" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-45" y2="-35" stroke="#ff8800" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-55" y2="0"   stroke="#ff6600" stroke-width="3" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-40" y2="30"  stroke="#ff4400" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="20"  y2="-58" stroke="#ffee00" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="0" x2="-20" y2="-58" stroke="#ffee00" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        <!-- smoke puffs -->
+        <g id="expl-smoke" opacity="0">
+          <circle cx="-20" cy="-40" r="16" fill="#555" opacity="0.7"/>
+          <circle cx="15"  cy="-45" r="13" fill="#666" opacity="0.6"/>
+          <circle cx="-5"  cy="-55" r="18" fill="#444" opacity="0.7"/>
+          <circle cx="30"  cy="-35" r="12" fill="#555" opacity="0.5"/>
+          <circle cx="-35" cy="-30" r="14" fill="#4a4a4a" opacity="0.6"/>
+        </g>
+        <!-- crater -->
+        <ellipse id="expl-crater" cx="0" cy="10" rx="0" ry="0" fill="#1a1000" opacity="0"/>
+        <!-- 💥 emoji in center -->
+        <text id="expl-emoji" x="0" y="8" font-size="0" text-anchor="middle" opacity="0">💥</text>
+      </g>
+
     </svg>
 
     <div id="word-display"></div>
@@ -302,9 +465,10 @@
 
   <!-- RESULT -->
   <div class="screen" id="screen-result">
-    <div class="result-emoji" id="result-emoji">🎉</div>
-    <h2 id="result-title" class="result-title-win">כל הכבוד!</h2>
-    <p class="result-city" id="result-city">ניחשת נכון: <strong id="result-city-name"></strong></p>
+    <div class="result-emoji" id="result-emoji">✈️</div>
+    <h2 id="result-title" class="result-title-win">יפה!</h2>
+    <p id="result-subtitle" style="color:#94a3b8;font-size:14px;margin-bottom:8px;">הצלחת לברוח בזמן 🏃💨</p>
+    <p class="result-city" id="result-city">היישוב: <strong id="result-city-name"></strong></p>
 
     <div id="result-word-display"></div>
 
@@ -319,7 +483,7 @@
       <button class="btn btn-ghost" style="margin-top:0" onclick="showScreen('menu')">תפריט</button>
     </div>
     <div class="score" id="result-score">
-      נצחונות: <span class="win" id="score-wins-r">0</span> | הפסדים: <span class="loss" id="score-losses-r">0</span>
+      הצלחות: <span class="win" id="score-wins-r">0</span> | פגיעות: <span class="loss" id="score-losses-r">0</span>
     </div>
   </div>
 
@@ -329,61 +493,60 @@
 // ───────────────────────────────────────────
 // STATE
 // ───────────────────────────────────────────
-const CSV_URL        = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
-const CSV_URL_PROXY  = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
+const CSV_URL = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
 const SINCE_DATE = new Date('2026-02-28T00:00:00');
-const HEB        = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
-// Map regular letter → final form (and back)
-const FINALS = { 'כ':'ך', 'מ':'ם', 'נ':'ן', 'פ':'ף', 'צ':'ץ' };
-const FINALS_REV = Object.fromEntries(Object.entries(FINALS).map(([k,v]) => [v,k]));
-// Returns true if guessed letter matches the character (accounting for finals)
+const HEB = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+
+const FINALS = { 'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ' };
+const FINALS_REV = Object.fromEntries(Object.entries(FINALS).map(([k,v])=>[v,k]));
+
 function letterMatches(guessed, ch) {
   return guessed === ch
     || (FINALS[guessed] && FINALS[guessed] === ch)
     || (FINALS_REV[guessed] && FINALS_REV[guessed] === ch);
 }
-// Returns true if the word contains a match for the guessed letter
 function wordContains(word, letter) {
   return word.split('').some(ch => letterMatches(letter, ch));
 }
-const DIFF_CFG   = {
+
+const DIFF_CFG = {
   easy:   { label:'קל',     attempts:10, colorClass:'easy'   },
   medium: { label:'בינוני', attempts:7,  colorClass:'medium' },
   hard:   { label:'קשה',    attempts:4,  colorClass:'hard'   },
 };
 
-let cities      = [];   // [{name, lastAlert, count}]
+let cities      = [];
 let currentCity = null;
 let guessed     = [];
 let difficulty  = 'medium';
 let score       = { wins:0, losses:0 };
+let animFrame   = null;
+let runPhase    = 0;
+let runTick     = 0;
 
 // ───────────────────────────────────────────
-// SCREEN MANAGEMENT
+// SCREEN
 // ───────────────────────────────────────────
 function showScreen(name) {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  // card width
   document.getElementById('main-card').classList.toggle('wide', name === 'playing');
 }
 
 // ───────────────────────────────────────────
-// FETCH & PARSE
+// FETCH
 // ───────────────────────────────────────────
 function fetchData() {
   showScreen('loading');
   const proxy = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
-
-  // Try direct first; on CORS/network failure fall back to proxy
   fetch(CSV_URL)
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
     .catch(() => fetch(proxy).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }))
     .then(text => {
       const parsed = parseAlarms(text);
-      if (!parsed.length) throw new Error('לא נמצאו נתונים בקובץ');
+      if (!parsed.length) throw new Error('לא נמצאו נתונים');
       cities = parsed;
-
       showScreen('menu');
     })
     .catch(err => {
@@ -430,25 +593,51 @@ function setDiff(d) {
 }
 
 // ───────────────────────────────────────────
-// GAME LOGIC
+// GAME
 // ───────────────────────────────────────────
 function startGame() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
   currentCity = cities[Math.floor(Math.random() * cities.length)];
   guessed = [];
+  runPhase = 0;
+  runTick  = 0;
+
+  // Reset scene elements that may have been hidden/modified by explosion
+  const figEl = document.getElementById('figure-group');
+  figEl.style.display = '';
+  figEl.setAttribute('transform', 'translate(80,155)');
+
+  document.getElementById('bomb-group').style.display = 'none';
+  document.getElementById('explosion-group').style.display = 'none';
+
+  // Reset explosion sub-elements
+  document.getElementById('expl-main').setAttribute('r', '0');
+  document.getElementById('expl-main').setAttribute('opacity', '0');
+  document.getElementById('expl-rays').setAttribute('opacity', '0');
+  document.getElementById('expl-smoke').setAttribute('opacity', '0');
+  document.getElementById('expl-crater').setAttribute('rx', '0');
+  document.getElementById('expl-crater').setAttribute('ry', '0');
+  document.getElementById('expl-crater').setAttribute('opacity', '0');
+  document.getElementById('expl-emoji').setAttribute('font-size', '0');
+  document.getElementById('expl-emoji').setAttribute('opacity', '0');
+
   showScreen('playing');
   renderPlaying();
+  startRunAnimation();
 }
 
+// ── Scene rendering ──────────────────────────
 function renderPlaying() {
   const cfg      = DIFF_CFG[difficulty];
   const maxAtt   = cfg.attempts;
   const wrongArr = guessed.filter(l => !wordContains(currentCity.name, l));
   const wrongCnt = wrongArr.length;
   const left     = maxAtt - wrongCnt;
+  const progress = wrongCnt / maxAtt; // 0 → 1
 
   // diff tag
   const tag = document.getElementById('diff-tag');
-  tag.textContent = cfg.label + ' — ' + left + ' נותרו';
+  tag.textContent = '✈️ ' + cfg.label + ' — ' + left + ' נותרו';
   tag.className = 'diff-tag diff-tag-' + difficulty;
 
   // dots
@@ -460,48 +649,161 @@ function renderPlaying() {
     dotsEl.appendChild(d);
   }
 
-  // hangman
-  renderHangman(wrongCnt, maxAtt);
+  // Update scene
+  updateScene(progress);
 
   // word
   renderWord('word-display', currentCity.name, guessed, false);
-
-  // keyboard
   renderKeyboard();
 }
 
-function renderHangman(wrongCnt, maxAtt) {
-  const parts  = Math.min(8, Math.round((wrongCnt / maxAtt) * 8));
-  const dead   = parts >= 7;
-  const col    = dead ? '#ef4444' : parts >= 4 ? '#f59e0b' : '#94a3b8';
+function updateScene(progress) {
+  // Bomb: starts at jet (230,30), falls toward figure (~80,145)
+  // progress 0 = bomb hidden, progress > 0 = bomb visible and falling
+  const bombEl = document.getElementById('bomb-group');
+  const explEl = document.getElementById('explosion-group');
 
-  const ids = ['hm-head','hm-body','hm-larm','hm-rarm','hm-lleg','hm-rleg'];
-  ids.forEach((id, i) => {
-    const el = document.getElementById(id);
-    el.style.display = parts >= i+1 ? '' : 'none';
-    el.setAttribute('stroke', col);
-  });
+  // hide explosion
+  explEl.style.display = 'none';
 
-  document.getElementById('hm-eyes').style.display = dead ? '' : 'none';
-  document.getElementById('hm-mouth-smile').style.display = (parts >= 1 && !dead) ? '' : 'none';
-  document.getElementById('hm-mouth-smile').setAttribute('stroke', col);
-  document.getElementById('hm-mouth-frown').style.display = dead ? '' : 'none';
+  if (progress <= 0) {
+    bombEl.style.display = 'none';
+    return;
+  }
+
+  bombEl.style.display = '';
+
+  // Jet is at ~(230, 30). Target (figure) at ~(80, 145).
+  // Bomb released from underside of jet: (230, 45)
+  const startX = 230, startY = 45;
+  const endX   = 80,  endY   = 145;
+
+  // Bomb travels along a slight arc
+  const t  = Math.min(progress, 0.95); // don't reach fully until explode
+  const bx = startX + (endX - startX) * t;
+  const by = startY + (endY - startY) * t * t; // quadratic drop
+
+  // Rotation: bomb tilts toward target
+  const angle = Math.atan2(endY - startY, endX - startX) * (180/Math.PI) + 90;
+
+  bombEl.setAttribute('transform', `translate(${bx},${by}) rotate(${angle})`);
+
+  // Figure runs away to the left as bomb approaches
+  // At progress=0 figure at x=80, at progress=1 figure at x=20
+  const figX = 80 - progress * 55;
+  // slight bounce
+  const figEl = document.getElementById('figure-group');
+  figEl.setAttribute('transform', `translate(${figX},155)`);
 }
 
+// ── Running animation loop ──────────────────
+function startRunAnimation() {
+  function tick() {
+    runTick++;
+    if (runTick % 8 === 0) runPhase = (runPhase + 1) % 4;
+    animateLegs(runPhase);
+    animFrame = requestAnimationFrame(tick);
+  }
+  animFrame = requestAnimationFrame(tick);
+}
+
+function animateLegs(phase) {
+  // 4-phase run cycle
+  const configs = [
+    { lleg:['-3','-14','-12','2'],  rleg:['3','-14','10','-6'],  larm:['-7','-26','-18','-14'], rarm:['7','-26','18','-18'] },
+    { lleg:['-3','-14','-6','-2'],  rleg:['3','-14','14','2'],   larm:['-7','-26','-14','-18'], rarm:['7','-26','14','-12'] },
+    { lleg:['-3','-14','-10','-6'], rleg:['3','-14','12','2'],   larm:['-7','-26','-16','-16'], rarm:['7','-26','16','-14'] },
+    { lleg:['-3','-14','-14','2'],  rleg:['3','-14','8','-8'],   larm:['-7','-26','-18','-16'], rarm:['7','-26','12','-16'] },
+  ];
+  const c = configs[phase];
+  setLine('fig-lleg', ...c.lleg);
+  setLine('fig-rleg', ...c.rleg);
+  setLine('fig-larm', ...c.larm);
+  setLine('fig-rarm', ...c.rarm);
+
+  // shoe positions
+  document.getElementById('fig-lshoe').setAttribute('cx', c.lleg[2]);
+  document.getElementById('fig-lshoe').setAttribute('cy', String(+c.lleg[3] + 2));
+  document.getElementById('fig-rshoe').setAttribute('cx', c.rleg[2]);
+  document.getElementById('fig-rshoe').setAttribute('cy', String(+c.rleg[3] + 2));
+}
+
+function setLine(id, x1, y1, x2, y2) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.setAttribute('x1', x1); el.setAttribute('y1', y1);
+  el.setAttribute('x2', x2); el.setAttribute('y2', y2);
+}
+
+// ── Explosion animation ──────────────────────
+function triggerExplosion(figX) {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+  // Hide running figure, move explosion to where figure was
+  const figEl = document.getElementById('figure-group');
+  figEl.style.display = 'none';
+  document.getElementById('bomb-group').style.display = 'none';
+
+  const explEl = document.getElementById('explosion-group');
+  explEl.setAttribute('transform', `translate(${figX},145)`);
+  explEl.style.display = '';
+
+  const mainCirc   = document.getElementById('expl-main');
+  const rays       = document.getElementById('expl-rays');
+  const smoke      = document.getElementById('expl-smoke');
+  const crater     = document.getElementById('expl-crater');
+  const emoji      = document.getElementById('expl-emoji');
+
+  // Shake the card
+  document.getElementById('main-card').classList.add('shake');
+  setTimeout(() => document.getElementById('main-card').classList.remove('shake'), 500);
+
+  // Animate
+  let t = 0;
+  function explTick() {
+    t += 0.04;
+    // main circle: grows then fades
+    const r     = Math.min(t * 80, 40);
+    const alpha = t < 0.4 ? t * 2.5 : Math.max(0, 1 - (t-0.4)*2);
+    mainCirc.setAttribute('r', r);
+    mainCirc.setAttribute('opacity', alpha);
+
+    // rays appear early
+    rays.setAttribute('opacity', t < 0.2 ? t*5 : Math.max(0,1-(t-0.2)*1.5));
+
+    // smoke rises after
+    smoke.setAttribute('opacity', t < 0.3 ? 0 : Math.min(0.8,(t-0.3)*2));
+    const smokeTranslate = t < 0.3 ? 0 : (t-0.3)*-30;
+    smoke.setAttribute('transform', `translate(0,${smokeTranslate})`);
+
+    // crater grows
+    const cr = Math.min(t*40, 22);
+    crater.setAttribute('rx', cr); crater.setAttribute('ry', cr*0.4);
+    crater.setAttribute('opacity', Math.min(t*3,0.8));
+
+    // emoji
+    const es = Math.min(t*60, 36);
+    emoji.setAttribute('font-size', es);
+    emoji.setAttribute('opacity', t < 0.1 ? 0 : Math.min(1,(t-0.1)*4));
+
+    if (t < 1.5) requestAnimationFrame(explTick);
+  }
+  requestAnimationFrame(explTick);
+}
+
+// ───────────────────────────────────────────
+// WORD / KEYBOARD
+// ───────────────────────────────────────────
 function renderWord(containerId, word, guessedArr, revealed) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
-
-  // Split by spaces so each word-segment stays on its own line
   const segments = word.split(' ');
   segments.forEach((segment, si) => {
-    // Wrap each segment in a no-break container
     const segEl = document.createElement('div');
     segEl.style.cssText = 'display:inline-flex;flex-wrap:nowrap;gap:5px;';
-
     for (const ch of segment) {
       const box = document.createElement('div');
-      if (ch === '-' || ch === "'") {
+      if (ch === '-' || ch === "'" || ch === ',') {
         box.className = 'letter-box blank-sep';
         box.textContent = ch;
       } else {
@@ -515,8 +817,6 @@ function renderWord(containerId, word, guessedArr, revealed) {
       segEl.appendChild(box);
     }
     container.appendChild(segEl);
-
-    // Add space gap between segments (except after last)
     if (si < segments.length - 1) {
       const sp = document.createElement('div');
       sp.className = 'letter-box space';
@@ -548,15 +848,22 @@ function handleGuess(letter) {
   const cfg      = DIFF_CFG[difficulty];
   const maxAtt   = cfg.attempts;
   const wrongCnt = guessed.filter(l => !wordContains(currentCity.name, l)).length;
-  const wordChars = currentCity.name.split('').filter(c => c !== ' ' && c !== '-' && c !== "'");
+  const wordChars = currentCity.name.split('').filter(c => c !== ' ' && c !== '-' && c !== "'" && c !== ',');
   const allRight  = wordChars.every(c => guessed.some(g => letterMatches(g, c)));
 
   if (allRight) {
     score.wins++;
-    showResult('win');
+    setTimeout(() => showResult('win'), 300);
   } else if (wrongCnt >= maxAtt) {
     score.losses++;
-    showResult('lose');
+    // get figure x for explosion position
+    const progress = wrongCnt / maxAtt;
+    const figX = 80 - progress * 55;
+    renderPlaying(); // update scene first (bomb at figure)
+    setTimeout(() => {
+      triggerExplosion(figX);
+      setTimeout(() => showResult('lose'), 2000);
+    }, 150);
   } else {
     renderPlaying();
   }
@@ -564,10 +871,11 @@ function handleGuess(letter) {
 
 function showResult(res) {
   const won = res === 'win';
-  document.getElementById('result-emoji').textContent     = won ? '🎉' : '💀';
-  document.getElementById('result-title').textContent     = won ? 'כל הכבוד!' : 'אוי לא!';
+  document.getElementById('result-emoji').textContent     = won ? '🏃💨' : '💥';
+  document.getElementById('result-title').textContent     = won ? 'יפה!' : 'בום!';
   document.getElementById('result-title').className       = 'result-title-' + (won ? 'win' : 'lose');
-  document.getElementById('result-city').firstChild.textContent = (won ? 'ניחשת נכון: ' : 'היישוב היה: ');
+  document.getElementById('result-subtitle').textContent  = won ? 'הצלחת לברוח בזמן 🎉' : 'הפצצה פגעה! 😱';
+  document.getElementById('result-city').firstChild.textContent = 'היישוב היה: ';
   document.getElementById('result-city-name').textContent = currentCity.name;
 
   renderWord('result-word-display', currentCity.name, guessed, !won);
@@ -597,7 +905,8 @@ function updateScore() {
 // ───────────────────────────────────────────
 fetchData();
 </script>
-<div style="position:fixed;bottom:10px;width:100%;text-align:center;color:#334155;font-size:11px;font-family:'Heebo',sans-serif;pointer-events:none;">
+
+<div style="position:fixed;bottom:10px;width:100%;text-align:center;color:#1e3a5f;font-size:11px;font-family:'Heebo',sans-serif;pointer-events:none;">
   נתונים: פיקוד העורף, בסיוע יובל הרפז
 </div>
 </body>
