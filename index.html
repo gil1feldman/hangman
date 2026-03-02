@@ -426,7 +426,7 @@
 // CONFIG
 // ───────────────────────────────────────────
 const CSV_URL    = 'https://raw.githubusercontent.com/yuval-harpaz/alarms/refs/heads/master/data/alarms.csv';
-const SHEET_URL  = 'https://script.google.com/macros/s/AKfycbxO9ME29EHqxS9S7Jbu5j8vZ0hnEOpXVSWJZnj1_fbsF3RsdTF72AC_oxth5eOtnpPhbw/exec';
+const SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwG2clmFj8sBVqqEMxZiNz82Br0TuxS2Ok_gT9q-rQstv650-xN4N9ve232aEGZwUlk7A/exec';
 const SINCE_DATE = new Date('2026-02-28T00:00:00');
 const HEB        = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
 
@@ -462,14 +462,20 @@ let gameStartTime = null;
 // GOOGLE SHEETS LOGGING (silent)
 // ───────────────────────────────────────────
 function logToSheet(result) {
-  const wrongGuesses = guessed.filter(l => !wordContains(currentCity.name, l)).length;
+  const duration       = Math.round((new Date() - gameStartTime) / 1000);
+  const wrongLetters   = guessed.filter(l => !wordContains(currentCity.name, l));
+  const correctLetters = guessed.filter(l =>  wordContains(currentCity.name, l));
   const payload = {
-    time:        new Date().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }),
-    city:        currentCity.name,
-    wrongGuesses: wrongGuesses,
-    maxAttempts: DIFF_CFG[difficulty].attempts,
-    result:      result === 'win' ? 'הצלחה' : 'כישלון',
-    difficulty:  DIFF_CFG[difficulty].label,
+    time:           new Date().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }),
+    city:           currentCity.name,
+    difficulty:     DIFF_CFG[difficulty].label,
+    result:         result === 'win' ? 'הצלחה' : 'כישלון',
+    duration:       duration,
+    wrongGuesses:   wrongLetters.length,
+    maxAttempts:    DIFF_CFG[difficulty].attempts,
+    correctLetters: correctLetters.join(', '),
+    wrongLetters:   wrongLetters.join(', '),
+    guessSequence:  guessed.join(', '),
   };
   fetch(SHEET_URL, {
     method: 'POST',
